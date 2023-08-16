@@ -1,0 +1,13 @@
+# Product Data Manipulation API
+
+Welcome to the Product Data Manipulation API repository! This project showcases an ASP.NET Core Web API designed to handle various operations related to product data management. The API is built using a combination of Dapper and Entity Framework (EF) Core, offering efficient and flexible data access mechanisms.
+
+## Features
+
+- **Dapper**: Leveraging the power of Dapper, a micro ORM, this API ensures high-performance data retrieval and manipulation. Dapper's simplicity and performance make it an excellent choice for applications that require rapid data access.
+
+- **Entity Framework Core**: The API also utilizes Entity Framework Core for its ORM capabilities. EF Core simplifies database interactions by providing a rich set of abstractions, migrations for database schema management, and LINQ support for querying.
+
+- **Stored Procedures**: In addition to ORM-based data access, this project incorporates the usage of stored procedures for specific database operations. Stored procedures can offer performance benefits and enhance security by limiting direct access to tables.
+
+
