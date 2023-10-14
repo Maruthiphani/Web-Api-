@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Reflection;
 using System.Net;
+using Microsoft.AspNetCore.Cors;
 
 namespace ConsumeWebAPI.Controllers
 {
@@ -14,7 +15,8 @@ namespace ConsumeWebAPI.Controllers
 
         
         Uri baseAddress = new Uri("http://localhost:5234/api");
-      
+       
+
         private readonly HttpClient _client;
 
         public ProductController()
@@ -41,16 +43,37 @@ namespace ConsumeWebAPI.Controllers
             return View();
         }
 
-
+        
         [HttpPost]
         public IActionResult Create(ProductViewModel model)
         {
             string data = JsonConvert.SerializeObject(model);
-            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+            //string modifiedData = data.Replace("null", "\"\"");
+            string modifiedJson = data.Replace("\"ModifiedBy\":null", "\"ModifiedBy\":\"\"");
+            StringContent content = new StringContent(modifiedJson, Encoding.UTF8, "application/json");
             HttpResponseMessage response = _client.PostAsync(baseAddress + "/Product/Post", content).Result;
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction("index");
+            }
+            else
+            {
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    string errorMessage = response.Content.ReadAsStringAsync().Result;
+                    if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        ModelState.AddModelError(string.Empty, errorMessage);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "An error occurred while creating the product.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the product.");
+                }
             }
             return View();
         }
@@ -69,7 +92,7 @@ namespace ConsumeWebAPI.Controllers
             return View("Create", model);
         }
 
-
+        
         [HttpPost] 
         public IActionResult Edit(ProductViewModel model)
         {
@@ -80,10 +103,29 @@ namespace ConsumeWebAPI.Controllers
             {
                 return RedirectToAction("index");
             }
-            return View("Create", model);
+            else
+            {
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    string errorMessage = response.Content.ReadAsStringAsync().Result;
+                    if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        ModelState.AddModelError(string.Empty, errorMessage);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "An error occurred while updating the product.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "An error occurred while updating the product.");
+                }
+            }
+                return View("Create", model);
         }
 
-
+     
         public IActionResult Delete(int id)
         {
             HttpResponseMessage response = _client.DeleteAsync(baseAddress + "/Product/Delete/" + id).Result;
@@ -93,7 +135,7 @@ namespace ConsumeWebAPI.Controllers
             }
             return View("Error");
         }
-
+        
         public IActionResult Details(int id)
         {
             ProductViewModel model = new ProductViewModel();
